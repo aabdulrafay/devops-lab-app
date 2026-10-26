@@ -1,0 +1,23 @@
+name: DevOps CI Build Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: docker build -t devops-flask-app:${{ github.sha }} .
+
+      - name: Test Container Execution
+        run: |
+          docker run -d -p 5000:5000 --name test-app devops-flask-app:${{ github.sha }}
+          sleep 3
+          docker ps | grep test-app
